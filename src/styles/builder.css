@@ -1,0 +1,175 @@
+/* Step navigation */
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.step-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #374151;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+  color: #9CA3AF;
+}
+
+.step-item.active .step-number {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.step-label {
+  font-size: 0.875rem;
+  color: #9CA3AF;
+  transition: all 0.3s ease;
+}
+
+.step-item.active .step-label {
+  color: #F3F4F6;
+  font-weight: 600;
+}
+
+.step-divider {
+  flex-grow: 1;
+  height: 2px;
+  background-color: #4B5563;
+  margin-top: -18px;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+/* Template card */
+.template-card {
+  border: 2px solid #4B5563;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: #1F2937;
+}
+
+.template-card:hover {
+  border-color: #60A5FA;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+}
+
+.template-card.active {
+  border-color: #3b82f6;
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.15);
+}
+
+/* Toggle switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #4B5563;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #E5E7EB;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #3b82f6;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+/* Form section styling */
+.form-section {
+  border-radius: 0.5rem;
+  border: 1px solid #4B5563;
+  padding: 1.25rem;
+  background-color: #1F2937;
+}
+
+/* Letter aspect ratio for resume preview */
+.max-w-letter {
+  max-width: 8.5in;
+  width: 100%;
+}
+
+/* Dark theme additional styles */
+.dark-bg-primary {
+  background-color: #111827;
+}
+
+.dark-bg-secondary {
+  background-color: #1F2937;
+}
+
+.dark-text-primary {
+  color: #F9FAFB;
+}
+
+.dark-text-secondary {
+  color: #D1D5DB;
+}
+
+.dark-text-muted {
+  color: #9CA3AF;
+}
+
+.dark-border {
+  border-color: #374151;
+}
+
+/* Input field dark styling */
+.dark-input {
+  background-color: #374151;
+  border-color: #4B5563;
+  color: #F9FAFB;
+}
+
+.dark-input:focus {
+  border-color: #60A5FA;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
