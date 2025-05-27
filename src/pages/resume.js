@@ -1,16 +1,12 @@
-import Image from "next/image";
-import { Geist, Geist_Mono, Red_Hat_Display } from "next/font/google";
+import { Red_Hat_Display } from "next/font/google";
 import Head from "next/head";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { useState,useEffect } from "react";
+import ToggleSwitch from "../components/ToggleSwitch";
+import { useRouter } from "next/router";
+import { saveResumeData, loadResumeData } from "../utils/storage";
+import "../styles/home.css";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const redHatDisplay = Red_Hat_Display({
   variable: "--font-red-hat-display",
@@ -18,153 +14,501 @@ const redHatDisplay = Red_Hat_Display({
 });
 
 export default function ResumePage() {
-return (
+  const router = useRouter();
+
+  // State for toggles
+  const [showExperience, setShowExperience] = useState(false);
+  const [showEducation, setShowEducation] = useState(false);
+  const [showSkills, setShowSkills] = useState(false);
+  const [showHobbies, setShowHobbies] = useState(false);
+  const [showLanguages, setShowLanguages] = useState(false);
+
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // State for form inputs
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [location, setLocation] = useState({ city: "", state: "", country: "" });
+  const [summary, setSummary] = useState("");
+  const [experience, setExperience] = useState([{ jobTitle: "", companyName: "", location: "", duration: "", responsibilities: "" }]);
+  const [education, setEducation] = useState([
+    {
+      degree: "",
+      institution: "",
+      graduationYear: ""
+    }
+  ]);
+
+  const [skills, setSkills] = useState("");
+  const [languages, setLanguages] = useState([
+    { language: "", proficiency: "" }
+  ]);
+
+  const [hobbies, setHobbies] = useState("");
+
+  // Validate form inputs
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    console.log('Loading data from secure storage...');
+    const savedData = loadResumeData();
+    
+    setFullName(savedData.fullName);
+    setEmail(savedData.email);
+    setPhone(savedData.phone);
+    setLocation(savedData.location);
+    setSummary(savedData.summary);
+    setExperience(savedData.experience);
+    setEducation(savedData.education);
+    setSkills(savedData.skills);
+    setLanguages(savedData.languages);
+    setHobbies(savedData.hobbies);
+    
+    // Load toggle states
+    setShowExperience(savedData.showExperience);
+    setShowEducation(savedData.showEducation);
+    setShowSkills(savedData.showSkills);
+    setShowLanguages(savedData.showLanguages);
+    setShowHobbies(savedData.showHobbies);
+    
+    setIsLoaded(true);
+  }, []);
+
+  // Save data to secure storage whenever state changes
+  useEffect(() => {
+    if (!isLoaded) return;
+    
+    const dataToSave = {
+      fullName,
+      email,
+      phone,
+      location,
+      summary,
+      experience,
+      education,
+      skills,
+      languages,
+      hobbies,
+      showExperience,
+      showEducation,
+      showSkills,
+      showLanguages,
+      showHobbies,
+    };
+    
+    const success = saveResumeData(dataToSave);
+    if (!success) {
+      console.warn('Failed to save resume data');
+    }
+  }, [isLoaded, fullName, email, phone, location, summary, experience, education, skills, languages, hobbies, showExperience, showEducation, showSkills, showLanguages, showHobbies]);
+
+
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const handleSubmit = () => {
+    const newErrors = {};
+    if (!fullName) newErrors.fullName = "Full Name is required";
+    if (!email) newErrors.email = "Email is required";
+    if (!validateEmail(email)) newErrors.email = "Invalid email format";
+    if (!phone) newErrors.phone = "Phone number is required";
+    if (location.city === "") newErrors.city = "City is required";
+    if (location.state === "") newErrors.state = "State is required";
+    if (location.country === "") newErrors.country = "Country is required";
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      const query = {
+        fullName,
+        email,
+        phone,
+        city: location.city,
+        state: location.state,
+        country: location.country,
+        summary,
+      };
+
+      if (showExperience) {
+        query.experience = JSON.stringify(experience);
+      }
+
+      if (showEducation) {
+        query.education = JSON.stringify(education);
+      }
+
+      // Add skills if toggled on
+      if (showSkills) {
+        query.skills = skills;
+      }
+
+      if (showLanguages) {
+        query.languages = JSON.stringify(languages);
+      }
+
+      if (showHobbies) {
+        query.hobbies = hobbies;
+      }
+
+      router.push({
+        pathname: '/preview',
+        query: query,
+      });
+    }
+    
+  };
+
+  return (
     <>
-        <Head>
-            <title>Resume Builder</title>
-            <style jsx global>{`
-                .gradient-animation {
-                    background: linear-gradient(-90deg, #007cf0, #00dfd8, #ff0080, #007cf0);
-                    background-size: 400% 100%;
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                    color: transparent;
-                    animation: backgroundAnim 8s ease-in-out infinite;
-                }
-                
-                @keyframes backgroundAnim {
-                    50% {
-                        background-position: 140% 50%;
-                    }
-                }
-            `}</style>
-        </Head>
-        <div
-            className={`${geistSans.className} ${geistMono.className} ${redHatDisplay.className} grid grid-rows-[auto_1fr_auto] min-h-screen p-8 font-[family-name:var(--font-geist-sans)]`}
-        >
-            <header className="py-4 border-b">
-                <div className="container mx-auto flex justify-between items-center">
-                    <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-                        Resume <span className="gradient-animation">Builder</span>
-                    </h1>
-                    <a href="./">
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Back to home</button>
-                    </a>
-                </div>
-            </header>
-            
-            <main className="container mx-auto py-8">
-                <div className="bg-gray-900 shadow-lg rounded-lg p-6 mb-8">
-                    <h2 className="text-2xl font-bold mb-4">Personal Information</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Full Name
-                            </label>
-                            <input
-                                type="text"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                placeholder="John Doe"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                placeholder="john@example.com"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Phone
-                            </label>
-                            <input
-                                type="tel"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                placeholder="+1 (555) 123-4567"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Location
-                            </label>
-                            <input
-                                type="text"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                placeholder="New York, NY"
-                            />
-                        </div>
-                    </div>
-                </div>
+      <Head>
+        <title>Add info - Resume Builder</title>
+      </Head>
+      <div className={`${redHatDisplay.className} min-h-screen bg-gray-900 text-white`}>
+        <Header />
 
-                <div className="bg-gray-900 shadow-lg rounded-lg p-6">
-                    <h2 className="text-2xl font-bold mb-4">Professional Summary</h2>
+        <main className="container mx-auto py-8">
+          <div className="bg-gray-900 shadow-lg rounded-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold mb-4">Personal Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="John Doe"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+                {errors.fullName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="john@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                {errors.email && (<p className="text-red-500 text-sm mt-1">{errors.email}</p>)}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="+91 XXXXX XXXXX"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+                {errors.phone && (<p className="text-red-500 text-sm mt-1">{errors.phone}</p>)}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">
+                  City
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="City"
+                  value={location.city}
+                  onChange={(e) => setLocation({ ...location, city: e.target.value })}
+                />
+                {errors.city && (<p className="text-red-500 text-sm mt-1">{errors.city}</p>)}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">
+                  State
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="State"
+                  value={location.state}
+                  onChange={(e) => setLocation({ ...location, state: e.target.value })}
+                />
+                {errors.state && (<p className="text-red-500 text-sm mt-1">{errors.state}</p>)}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">
+                  Country
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="Country"
+                  value={location.country}
+                  onChange={(e) => setLocation({ ...location, country: e.target.value })}
+                />
+                {errors.country && (<p className="text-red-500 text-sm mt-1">{errors.country}</p>)}
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-900 shadow-lg rounded-lg p-6">
+            <h2 className="text-2xl font-bold mb-4">Professional Summary</h2>
+            <textarea
+              className="w-full px-3 py-2 border border-gray-300 rounded-md h-32"
+              placeholder="Write a brief summary of your professional background and skills..."
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+            >
+            </textarea>
+            {errors.summary && (<p className="text-red-500 text-sm mt-1">{errors.summary}</p>)}
+          </div>
+
+          {/* Experience Section */}
+          <div className="bg-gray-900 shadow-lg rounded-lg p-6 my-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Experience</h2>
+              <ToggleSwitch
+                isChecked={showExperience}
+                onChange={() => setShowExperience(!showExperience)}
+                label="Include Experience"
+              />
+            </div>
+
+            {showExperience && (
+              <div>
+                {experience.map((exp, index) => (
+                  <div key={index} className="mb-4">
+                    <label className="block text-sm font-medium text-gray-400 mb-1">Experience #{index + 1}</label>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md mb-2 text-white"
+                      placeholder="Job Title"
+                      value={exp.jobTitle}
+                      onChange={(e) => {
+                        const newExperience = [...experience];
+                        newExperience[index].jobTitle = e.target.value;
+                        setExperience(newExperience);
+                      }}
+                    />
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md mb-2 text-white"
+                      placeholder="Company Name"
+                      value={exp.companyName}
+                      onChange={(e) => {
+                        const newExperience = [...experience];
+                        newExperience[index].companyName = e.target.value;
+                        setExperience(newExperience);
+                      }}
+                    />
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md mb-2 text-white"
+                      placeholder="Location"
+                      value={exp.location}
+                      onChange={(e) => {
+                        const newExperience = [...experience];
+                        newExperience[index].location = e.target.value;
+                        setExperience(newExperience);
+                      }}
+                    />
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md mb-2 text-white"
+                      placeholder="Duration"
+                      value={exp.duration}
+                      onChange={(e) => {
+                        const newExperience = [...experience];
+                        newExperience[index].duration = e.target.value;
+                        setExperience(newExperience);
+                      }}
+                    />
                     <textarea
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md h-32"
-                        placeholder="Write a brief summary of your professional background and skills..."
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white"
+                      placeholder="Describe your responsibilities and achievements..."
+                      value={exp.responsibilities}
+                      onChange={(e) => {
+                        const newExperience = [...experience];
+                        newExperience[index].responsibilities = e.target.value;
+                        setExperience(newExperience);
+                      }}
                     ></textarea>
-                </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                  onClick={() => setExperience([...experience, { jobTitle: '', companyName: '', location: '', duration: '', responsibilities: '' }])}
+                >
+                  + Add Experience
+                </button>
+              </div>
+            )}
+          </div>
 
-                <div className="bg-gray-900 shadow-lg rounded-lg p-6 my-8">
-                    <h2 className="text-2xl font-bold mb-4">Experience</h2>
-                    <div className="flex items-center mb-4">
-                            <label className="flex items-center cursor-pointer">
-                                    <input
-                                            type="checkbox"
-                                            className="form-checkbox h-5 w-5 text-blue-600"
-                                            // You can manage this state with useState if needed
-                                    />
-                                    <span className="ml-2 text-gray-200">Include Experience Section</span>
-                            </label>
-                    </div>
-                    <div>
-                            {/* Example experience entry, you can map over experience array here */}
-                            <div className="mb-4">
-                                    <input
-                                            type="text"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2"
-                                            placeholder="Job Title"
-                                    />
-                                    <input
-                                            type="text"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2"
-                                            placeholder="Company Name"
-                                    />
-                                    <input
-                                            type="text"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2"
-                                            placeholder="Location"
-                                    />
-                                    <input
-                                            type="text"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2"
-                                            placeholder="Duration"
-                                    />
-                                    <textarea
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                            placeholder="Describe your responsibilities and achievements..."
-                                    ></textarea>
-                            </div>
-                            <button
-                                    type="button"
-                                    className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                                    // Add onClick handler to add new experience entry
-                            >
-                                    + Add Experience
-                            </button>
-                    </div>
+          {/* Education Section */}
+          <div className="bg-gray-900 shadow-lg rounded-lg p-6 my-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Education</h2>
+              <ToggleSwitch
+                isChecked={showEducation}
+                onChange={() => setShowEducation(!showEducation)}
+              />
+            </div>
+
+            {showEducation && (
+              <div>
+                {/* Education form fields */}
+                {education.map((edu, index) => (
+                    <div key={index} className="mb-4">
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md mb-2 text-white"
+                    placeholder="Degree"
+                    value={edu.degree}
+                    onChange={(e) => {
+                      const newEducation = [...education];
+                      newEducation[index].degree = e.target.value;
+                      setEducation(newEducation);
+                    }}
+                  />
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md mb-2 text-white"
+                    placeholder="Institution"
+                    value={edu.institution}
+                    onChange={(e) => {
+                      const newEducation = [...education];
+                      newEducation[index].institution = e.target.value;
+                      setEducation(newEducation);
+                    }}
+                  />
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md mb-2 text-white"
+                    placeholder="Graduation Year"
+                    value={edu.graduationYear}
+                    onChange={(e) => {
+                      const newEducation = [...education];
+                      newEducation[index].graduationYear = e.target.value;
+                      setEducation(newEducation);
+                    }}
+                  />
                 </div>
-            </main>
-            
-            <footer className="py-4 border-t">
-                <div className="container mx-auto text-center text-sm text-gray-600">
-                    &copy; {new Date().getFullYear()} Resume Builder. All rights reserved.
+              ))}
+              <button
+                type="button"
+                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                onClick={() => setEducation([...education, { degree: '', institution: '', graduationYear: '' }])}
+              >
+                + Add Education
+              </button>
+            </div>
+          )}
+          </div>
+
+          {/* Skills Section */}
+          <div className="bg-gray-900 shadow-lg rounded-lg p-6 my-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Skills</h2>
+              <ToggleSwitch
+                isChecked={showSkills}
+                onChange={() => setShowSkills(!showSkills)}
+              />
+            </div>
+
+            {showSkills && (
+              <div>
+                {/* Skills form fields */}
+                <textarea
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white h-32"
+                  placeholder="List your skills (e.g., JavaScript, Project Management, Photoshop)"
+                  value={skills}
+                  onChange={(e) => setSkills(e.target.value)}
+                ></textarea>
+              </div>
+            )}
+          </div>
+
+          {/* Languages Section */}
+          <div className="bg-gray-900 shadow-lg rounded-lg p-6 my-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Languages</h2>
+              <ToggleSwitch
+                isChecked={showLanguages}
+                onChange={() => setShowLanguages(!showLanguages)}
+              />
+            </div>
+
+            {showLanguages && (
+              <div>
+                {/* Language form fields */}
+                <div className="mb-4">
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md mb-2 text-white"
+                    placeholder="Language"
+                    value={languages[0].language}
+                    onChange={(e) => setLanguages([{ ...languages[0], language: e.target.value }])}
+                  />
+                  <select className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white">
+                    <option value="">-- Proficiency --</option>
+                    <option value="native">Native</option>
+                    <option value="fluent">Fluent</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="basic">Basic</option>
+                  </select>
                 </div>
-            </footer>
+                <button
+                  type="button"
+                  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                >
+                  + Add Language
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Hobbies Section */}
+          <div className="bg-gray-900 shadow-lg rounded-lg p-6 my-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">Hobbies</h2>
+              <ToggleSwitch
+                isChecked={showHobbies}
+                onChange={() => setShowHobbies(!showHobbies)}
+              />
+            </div>
+
+            {showHobbies && (
+              <div>
+                {/* Hobbies form fields */}
+                <textarea
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white h-24"
+                  placeholder="List your hobbies and interests"
+                  value={hobbies}
+                  onChange={(e) => setHobbies(e.target.value)}
+                ></textarea>
+              </div>
+            )}
+          </div>
+        </main>
+        <div className="flex justify-center space-around p-4">
+            <button className="mr-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500 transition"
+            onClick={() => router.back()}>
+                ← Home
+            </button>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            onClick={() => handleSubmit()}>
+                Preview
+            </button>
         </div>
+
+        <Footer />
+      </div>
     </>
-);
+  );
 }
