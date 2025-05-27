@@ -1,6 +1,5 @@
 import { Red_Hat_Display } from "next/font/google";
 import Head from "next/head";
-import "../styles/home.css";
 import { Router, useRouter } from "next/router";
 import WelcomeLogo from "@/components/WelcomeLogo";
 

@@ -4,7 +4,6 @@ import { useState,useEffect } from "react";
 import ToggleSwitch from "../components/ToggleSwitch";
 import { useRouter } from "next/router";
 import { saveResumeData, loadResumeData } from "../utils/storage";
-import "../styles/home.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -442,30 +441,43 @@ export default function ResumePage() {
                 isChecked={showLanguages}
                 onChange={() => setShowLanguages(!showLanguages)}
               />
-            </div>
-
-            {showLanguages && (
+            </div>            {showLanguages && (
               <div>
                 {/* Language form fields */}
-                <div className="mb-4">
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md mb-2 text-white"
-                    placeholder="Language"
-                    value={languages[0].language}
-                    onChange={(e) => setLanguages([{ ...languages[0], language: e.target.value }])}
-                  />
-                  <select className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white">
-                    <option value="">-- Proficiency --</option>
-                    <option value="native">Native</option>
-                    <option value="fluent">Fluent</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="basic">Basic</option>
-                  </select>
-                </div>
+                {languages.map((lang, index) => (
+                  <div key={index} className="mb-4">
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md mb-2 text-white"
+                      placeholder="Language"
+                      value={lang.language}
+                      onChange={(e) => {
+                        const newLanguages = [...languages];
+                        newLanguages[index].language = e.target.value;
+                        setLanguages(newLanguages);
+                      }}
+                    />
+                    <select 
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white"
+                      value={lang.proficiency}
+                      onChange={(e) => {
+                        const newLanguages = [...languages];
+                        newLanguages[index].proficiency = e.target.value;
+                        setLanguages(newLanguages);
+                      }}
+                    >
+                      <option value="">-- Proficiency --</option>
+                      <option value="native">Native</option>
+                      <option value="fluent">Fluent</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="basic">Basic</option>
+                    </select>
+                  </div>
+                ))}
                 <button
                   type="button"
                   className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                  onClick={() => setLanguages([...languages, { language: '', proficiency: '' }])}
                 >
                   + Add Language
                 </button>
