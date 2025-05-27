@@ -177,7 +177,7 @@ export default function ResumePage() {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-400 rounded-md bg-gray-800"
                   placeholder="John Doe"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -192,7 +192,7 @@ export default function ResumePage() {
                 </label>
                 <input
                   type="email"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-400 rounded-md bg-gray-800"
                   placeholder="john@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -205,7 +205,7 @@ export default function ResumePage() {
                 </label>
                 <input
                   type="tel"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-400 rounded-md bg-gray-800"
                   placeholder="+91 XXXXX XXXXX"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -218,7 +218,7 @@ export default function ResumePage() {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-400 rounded-md bg-gray-800"
                   placeholder="City"
                   value={location.city}
                   onChange={(e) => setLocation({ ...location, city: e.target.value })}
@@ -231,7 +231,7 @@ export default function ResumePage() {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-800"
                   placeholder="State"
                   value={location.state}
                   onChange={(e) => setLocation({ ...location, state: e.target.value })}
@@ -244,7 +244,7 @@ export default function ResumePage() {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-3 py-2 border border-gray-400 rounded-md bg-gray-800"
                   placeholder="Country"
                   value={location.country}
                   onChange={(e) => setLocation({ ...location, country: e.target.value })}
@@ -257,7 +257,7 @@ export default function ResumePage() {
           <div className="bg-gray-900 shadow-lg rounded-lg p-6">
             <h2 className="text-2xl font-bold mb-4">Professional Summary</h2>
             <textarea
-              className="w-full px-3 py-2 border border-gray-300 rounded-md h-32"
+              className="w-full px-3 py-2 border border-gray-400 rounded-md h-32 bg-gray-800"
               placeholder="Write a brief summary of your professional background and skills..."
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
