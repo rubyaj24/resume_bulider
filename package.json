@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "canvas-confetti": "^1.9.3",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
     "next": "15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
-  },  "devDependencies": {
+  },
+  "devDependencies": {
     "@eslint/eslintrc": "^3",
     "autoprefixer": "^10",
     "eslint": "^9",
